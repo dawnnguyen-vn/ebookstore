@@ -1,0 +1,10 @@
+services:
+  opds:
+    build:
+      context: .
+      dockerfile: ./.docker/golang/Dockerfile
+    ports:
+      - 1323:1323
+    volumes:
+      - ./:/app
+    tty: true

@@ -1,0 +1,8 @@
+{
+	"name": "golang1.23.2",
+	"dockerComposeFile": "../docker-compose.yml",
+    "service": "opds",
+    "workspaceFolder": "/app",
+	"remoteUser": "myuser",
+	"postCreateCommand": "bash .devcontainer/setup.sh"
+}
