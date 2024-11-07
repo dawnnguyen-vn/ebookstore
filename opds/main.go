@@ -1,13 +1,19 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"text/template"
 
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"google.golang.org/api/drive/v3"
+	"google.golang.org/api/option"
 )
 
 type Server struct {
@@ -15,23 +21,27 @@ type Server struct {
 
 func (s *Server) Mount(e *echo.Echo) {
 	base := e.Group("/opds")
-	base.GET("", s.GetHello)
-
-	base.GET("/download", func(c echo.Context) error {
-		// Set Content-Type for EPUB
-		c.Response().Header().Set(echo.HeaderContentType, "application/epub+zip")
-
-		// Set Content-Disposition to attachment to prompt download
-		c.Response().Header().Set("Content-Disposition", `attachment; filename="book.epub"`)
-
-		// Serve the file
-		return c.File("book.epub")
-	})
+	base.GET("/catalogs/:id", s.GetCatalog)
 }
 
-func (s *Server) GetHello(c echo.Context) error {
-	c.Response().Header().Set(echo.HeaderContentType, echo.MIMEApplicationXMLCharsetUTF8)
-	return c.Render(http.StatusOK, "index", "World")
+func (s *Server) GetCatalog(c echo.Context) error {
+	ctx := context.Background()
+	apiKey := os.Getenv("GOOGLE_API_KEY")
+	driveService, err := drive.NewService(ctx, option.WithAPIKey(apiKey))
+	if err != nil {
+		fmt.Print(err)
+		return c.JSON(400, err)
+	}
+	catalogID := c.Param("id")
+	query := fmt.Sprintf("'%s' in parents", catalogID)
+
+	r, err := driveService.Files.List().Q(query).SupportsAllDrives(true).IncludeItemsFromAllDrives(true).Do()
+	if err != nil {
+		fmt.Print(err)
+		return c.JSON(400, err)
+	}
+	// return c.JSON(http.StatusOK, r)
+	return c.Render(http.StatusOK, "index", r.Files)
 }
 
 type Template struct {
@@ -43,6 +53,11 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	e := echo.New()
 	t := &Template{
 		templates: template.Must(template.ParseGlob("public/views/*.html")),

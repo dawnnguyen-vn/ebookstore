@@ -4,5 +4,12 @@
     "service": "opds",
     "workspaceFolder": "/app",
 	"remoteUser": "myuser",
-	"postCreateCommand": "bash .devcontainer/setup.sh"
+	"postCreateCommand": "bash .devcontainer/setup.sh",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"golang.Go"
+			]
+		}
+	}
 }
