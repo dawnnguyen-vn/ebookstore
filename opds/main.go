@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"fmt"
 	"io"
 	"log"
@@ -33,9 +34,10 @@ func (s *Server) GetCatalog(c echo.Context) error {
 		fmt.Print(err)
 		return c.JSON(400, err)
 	}
-	catalogID := c.Param("id")
-	query := fmt.Sprintf("'%s' in parents", catalogID)
 
+	catalogID := c.Param("id")
+
+	query := fmt.Sprintf("'%s' in parents", catalogID)
 	r, err := driveService.Files.List().Q(query).SupportsAllDrives(true).IncludeItemsFromAllDrives(true).Do()
 	if err != nil {
 		fmt.Print(err)
@@ -47,8 +49,16 @@ func (s *Server) GetCatalog(c echo.Context) error {
 	return c.Render(http.StatusOK, "index", feeds)
 }
 
+//go:embed public/views/*.html
+var templatesFS embed.FS
+
 type Template struct {
 	templates *template.Template
+}
+
+func NewTemplate() *Template {
+	tmpl := template.Must(template.ParseFS(templatesFS, "public/views/*.html"))
+	return &Template{templates: tmpl}
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
@@ -56,21 +66,22 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 }
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	isLambda := os.Getenv("LAMBDA")
+
+	if isLambda != "TRUE" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file")
+		}
 	}
 
 	e := echo.New()
-	t := &Template{
-		templates: template.Must(template.ParseGlob("public/views/*.html")),
-	}
+
+	t := NewTemplate()
 	e.Renderer = t
 
 	server := Server{}
 	server.Mount(e)
-
-	isLambda := os.Getenv("LAMBDA")
 
 	if isLambda == "TRUE" {
 		lambdaAdapter := &LambdaAdapter{Echo: e}

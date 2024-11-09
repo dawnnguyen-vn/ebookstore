@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -26,8 +25,6 @@ func (a *LambdaAdapter) Handler(event events.APIGatewayProxyRequest) (events.API
 	}
 
 	resWriter := NewProxyResponseWriter()
-	log.Println("HELLO")
-	log.Println(event.Path, event.PathParameters, event.QueryStringParameters)
 
 	a.Echo.ServeHTTP(http.ResponseWriter(resWriter), req)
 
@@ -72,7 +69,6 @@ func (a *LambdaAdapter) ProxyEventToHTTPRequest(event events.APIGatewayProxyRequ
 
 	if err != nil {
 		fmt.Printf("Could not convert request %s:%s to http.Request\n", event.HTTPMethod, event.Path)
-		log.Println(err)
 		return nil, err
 	}
 

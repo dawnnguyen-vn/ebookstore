@@ -1,13 +1,17 @@
 package models
 
 import (
-	"fmt"
+	"os"
 
 	"google.golang.org/api/drive/v3"
 )
 
-const DRIVE_FOLDER_TYPE = "application/vnd.google-apps.folder"
-const NAVIGATION_TYPE = "application/atom+xml;profile=opds-catalog;kind=acquisition"
+var (
+	DRIVE_FOLDER_TYPE   = "application/vnd.google-apps.folder"
+	NAVIGATION_TYPE     = "application/atom+xml;profile=opds-catalog;kind=acquisition"
+	BASE_PATH           = os.Getenv("API_GATEWAY_STAGE") + "/opds/catalogs"
+	DRIVE_DOWNLOAD_LINK = "https://drive.google.com/uc?export=download&id="
+)
 
 type Feed struct {
 	Name     string
@@ -19,12 +23,12 @@ type Feed struct {
 func NewFeed(driveId string, driveName string, driveMimeType string) *Feed {
 	MimeType := driveMimeType
 	Type := "acquisition"
-	Link := fmt.Sprintf("https://drive.google.com/uc?export=download&id=%s", driveId)
+	Link := DRIVE_DOWNLOAD_LINK + driveId
 
 	if MimeType == DRIVE_FOLDER_TYPE {
 		MimeType = NAVIGATION_TYPE
 		Type = "navigation"
-		Link = fmt.Sprintf("/opds/catalogs/%s", driveId)
+		Link = BASE_PATH + "/" + driveId
 	}
 
 	return &Feed{
