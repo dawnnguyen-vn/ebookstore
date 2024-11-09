@@ -1,7 +1,7 @@
 {{define "navigation"}}
 <entry>
     <title>{{.Name}}</title>
-    <link rel="http://opds-spec.org/sort/popular" href="/opds/catalogs/{{.Id}}"
-          type="application/atom+xml;profile=opds-catalog;kind=acquisition" />
+    <link rel="http://opds-spec.org/sort/popular" href="{{.Link}}"
+          type="{{.MimeType}}" />
 </entry>
 {{end}}

@@ -16,7 +16,7 @@ type Feed struct {
 	Type     string
 }
 
-func NewFeed(driveId string, driveName string, driveMimeType string) Feed {
+func NewFeed(driveId string, driveName string, driveMimeType string) *Feed {
 	MimeType := driveMimeType
 	Type := "acquisition"
 	Link := fmt.Sprintf("https://drive.google.com/uc?export=download&id=%s", driveId)
@@ -27,7 +27,7 @@ func NewFeed(driveId string, driveName string, driveMimeType string) Feed {
 		Link = fmt.Sprintf("/opds/catalogs/%s", driveId)
 	}
 
-	return Feed{
+	return &Feed{
 		Name:     driveName,
 		Link:     Link,
 		MimeType: MimeType,
@@ -35,8 +35,8 @@ func NewFeed(driveId string, driveName string, driveMimeType string) Feed {
 	}
 }
 
-func ConvertFilesToFeeds(files []*drive.File) []Feed {
-	feeds := []Feed{}
+func ConvertFilesToFeeds(files []*drive.File) []*Feed {
+	feeds := []*Feed{}
 	for _, file := range files {
 		feed := NewFeed(file.Id, file.Name, file.MimeType)
 		feeds = append(feeds, feed)

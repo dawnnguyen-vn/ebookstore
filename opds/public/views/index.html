@@ -14,7 +14,11 @@
       </author>
 
       {{range .}}
-            {{template "navigation" .}}
+            {{if eq .Type "navigation"}}
+                  {{template "navigation" .}}
+            {{else if eq .Type "acquisition"}}
+                  {{template "acquisition" .}}
+            {{end}}
       {{end}}
 </feed>     
 {{end}}

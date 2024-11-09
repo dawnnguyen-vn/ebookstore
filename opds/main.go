@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"opds/models"
 	"os"
 	"text/template"
 
@@ -41,10 +42,9 @@ func (s *Server) GetCatalog(c echo.Context) error {
 		return c.JSON(400, err)
 	}
 
-	// feeds := models.ConvertFilesToFeeds(r.Files)
-	// return c.JSON(http.StatusOK, r.Files)
+	feeds := models.ConvertFilesToFeeds(r.Files)
 
-	return c.Render(http.StatusOK, "index", r.Files)
+	return c.Render(http.StatusOK, "index", feeds)
 }
 
 type Template struct {
