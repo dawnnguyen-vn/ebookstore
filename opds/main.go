@@ -40,7 +40,10 @@ func (s *Server) GetCatalog(c echo.Context) error {
 		fmt.Print(err)
 		return c.JSON(400, err)
 	}
-	// return c.JSON(http.StatusOK, r)
+
+	// feeds := models.ConvertFilesToFeeds(r.Files)
+	// return c.JSON(http.StatusOK, r.Files)
+
 	return c.Render(http.StatusOK, "index", r.Files)
 }
 

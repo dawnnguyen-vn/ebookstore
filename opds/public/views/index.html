@@ -6,22 +6,15 @@
             type="application/atom+xml;profile=opds-catalog;kind=navigation" />
       <link rel="start" href="/opds-catalogs/root.xml"
             type="application/atom+xml;profile=opds-catalog;kind=navigation" />
-      <title>OPDS Catalog Root Example</title>
+      <title>My Catalog</title>
       <updated>2010-01-10T10:03:10Z</updated>
       <author>
-            <name>Spec Writer</name>
+            <name>dawnnguyen-vn</name>
             <uri>http://opds-spec.org</uri>
       </author>
 
       {{range .}}
-            <entry>
-                  <title>{{ .Name }}</title>
-                  <link rel="http://opds-spec.org/sort/popular" href="/opds/catalogs/{{.Id}}"
-                        type="application/atom+xml;profile=opds-catalog;kind=acquisition" />
-                  <updated>2010-01-10T10:01:01Z</updated>
-                  <id>urn:uuid:d49e8018-a0e0-499e-9423-7c175fa0c56e</id>
-                  <content type="text">{{ .Name }}</content>
-            </entry>
+            {{template "navigation" .}}
       {{end}}
-</feed>
+</feed>     
 {{end}}
